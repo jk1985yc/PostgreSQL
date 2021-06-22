@@ -1,0 +1,58 @@
+
+version: '2'
+services:
+
+  pgsql.nginx:
+    build: ./nginx/
+    image: pgsql.nginx:0.0.1
+    container_name: pgsql.nginx
+    networks:
+        - vlan
+    depends_on:
+        - pgsql.php.fpm
+    volumes:
+        - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx/conf/conf.d:/etc/nginx/conf.d
+        - ./nginx/conf/fastcgi.conf:/etc/nginx/fastcgi.conf
+        - ./www:/www
+        - ./logs:/var/log/nginx
+        - "phpsocket:/var/run"
+    restart: always
+    ports:
+        - 15432:15432
+
+  pgsql.php.fpm:
+    build: ./php-fpm73/
+    image: pgsql.php.fpm:0.0.1
+    container_name: pgsql.php.fpm
+    networks:
+        - vlan
+    volumes:
+        - ./php-fpm73/conf:/usr/local/etc/php-fpm.d
+        - ./php-fpm73/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+        - ./www:/www
+        - "phpsocket:/var/run"
+    restart: always
+
+  pgsql:
+    build: ./pgsql_db/
+    image: pgsql:0.0.1
+    container_name: pgsql
+    networks:
+        - vlan
+    volumes:
+        - /etc/hosts:/etc/hosts:ro
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+        - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+        - ./pgsql_db/data:/var/lib/postgresql/data
+    environment:
+        #- POSTGRES_DB=
+        - POSTGRES_PASSWORD=1qasde32
+    restart: always 
+    ports:
+        - 5432:5432
+
+networks:
+  vlan:
+volumes:
+  phpsocket:
