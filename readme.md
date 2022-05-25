@@ -1,4 +1,4 @@
 ### PhpMyAdmin Defaule User
 user: postgres
-&nbsp;
+<br>
 PhpMyAdmin_Port: 15432
